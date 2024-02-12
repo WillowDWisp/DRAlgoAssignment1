@@ -5,10 +5,14 @@
 #include <fstream>  
 #include <vector>
 #include <string>
+#include <sstream>
+
 
 using namespace std;
 
 //template <typename T>;
+
+/*start of massive debug comment*/
 
 struct nodeType {
     int id;
@@ -29,14 +33,14 @@ void insertNode(string line) {
 
     std::istringstream iss(line);
     string s;
-    while (ifstream::getline(iss, s, ',')) {
+    while (std::getline(iss, s, ',')) {
         tempArray.push_back(s);
     }
 
     newNode->id = std::stoi(tempArray[0]);
     newNode->name = tempArray[1];
     newNode->price = stof(tempArray[2]);
-    newNode->category = tempArray[3][0];
+    newNode->category = tempArray[3][1];
 
     newNode->link = NULL;
 
@@ -66,7 +70,7 @@ string handleCat(char cat) {
     if (cat == 'E') {
         return "Electronics";
     }
-
+    return "uh oh";
 }
 
 //advances the position of 'current'
@@ -90,41 +94,60 @@ void printData() {
     }
 }
 
-
+/*end of massive debug comment*/
 
 
 int main()
 {
 
-    first = NULL;
-    last = NULL;
+
+   first = NULL;
+   last = NULL;
 
 
     //string used to pass the data from the text file to the linked list
     string strDat;
-    //reds from product_data.txt
-    try {
-        ifstream ProductData("product_data.txt");
+    //reads from product_data.txt
+    //for some odd reason it only looks in the debug folder.
+    ifstream ProductData("product_data.txt");
+    
+
+    /*try {
+        
+
         ProductData.exceptions(ifstream::failbit);
         //the while loops reads the text file line by line
-        while (getline(ProductData, strDat)) {
-            // runs insertNode for each line in the text file
-            insertNode(strDat);
-        }
+
         //this is supposed to close the text file after we're done reading it, but for some reason the function doesn't exist
-        ProductData.ifstream::close();
+
     }
     catch (const std::ios_base::failure& fail)
     {
         // handle exception here
         std::cout << fail.what() << '\n';
         return 1;
+    }*/
+
+    if (ProductData.ifstream::is_open()) {
+        while (getline(ProductData, strDat)) {
+            // runs insertNode for each line in the text file
+            insertNode(strDat);
+
+            //debug lines that print the whole file
+            //cout << strDat;
+            //cout << endl;
+        } 
+    }
+    else {
+        cout << "File not found";
     }
 
+    ProductData.ifstream::close();
     current = first;
 
-
+    printData();
     std::cout << "Hello World!\n";
+    cout << first->link->category << endl;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
