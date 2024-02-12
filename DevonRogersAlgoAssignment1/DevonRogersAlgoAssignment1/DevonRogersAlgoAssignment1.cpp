@@ -96,47 +96,21 @@ void printData() {
 
 /*end of massive debug comment*/
 
-
-int main()
-{
-
-
-   first = NULL;
-   last = NULL;
-
+void loadData() {
+    first = NULL;
+    last = NULL;
 
     //string used to pass the data from the text file to the linked list
     string strDat;
     //reads from product_data.txt
-    //for some odd reason it only looks in the debug folder.
     ifstream ProductData("product_data.txt");
-    
-
-    /*try {
-        
-
-        ProductData.exceptions(ifstream::failbit);
-        //the while loops reads the text file line by line
-
-        //this is supposed to close the text file after we're done reading it, but for some reason the function doesn't exist
-
-    }
-    catch (const std::ios_base::failure& fail)
-    {
-        // handle exception here
-        std::cout << fail.what() << '\n';
-        return 1;
-    }*/
 
     if (ProductData.ifstream::is_open()) {
         while (getline(ProductData, strDat)) {
             // runs insertNode for each line in the text file
             insertNode(strDat);
 
-            //debug lines that print the whole file
-            //cout << strDat;
-            //cout << endl;
-        } 
+        }
     }
     else {
         cout << "File not found";
@@ -144,10 +118,16 @@ int main()
 
     ProductData.ifstream::close();
     current = first;
+}
+
+int main()
+{
+    loadData();
+
+
 
     printData();
-    std::cout << "Hello World!\n";
-    cout << first->link->category << endl;
+
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
