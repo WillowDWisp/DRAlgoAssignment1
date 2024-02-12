@@ -70,7 +70,7 @@ void insertNode(string line) {
 
 void insertNode() {
     int answer = 0;
-    cout << "How would you like to add a new product?\n1. One attribute at a time.\n2. All attributes at once.\n3. Cancel.\n";
+    cout << "How would you like to add a new product?\n1. One attribute at a time.\n2. All attributes at once.\n3. From a file.\n4. Cancel.\n";
     cin >> answer;
     if (answer == 2) {
         cout << "Please enter the details for the new product in the following format, replacing the square brackets with the corresponding attribute: [ID], [Name], [Price], [Category]\n";
@@ -136,6 +136,31 @@ void insertNode() {
 
     }
     //if the user inserts 3 (or anything else) it returns them to the previous menu
+    else if (answer == 3) {
+        //string used to pass the data from the text file to the linked list
+        string strDat;
+        //string that hopefully contains the name of the file the user wants to load
+        string userFile;
+        cout << "Please enter the name of the file you would like to add products from. Please make sure the file is formatted correctly.\n";
+        cin >> userFile;
+        //reads from product_data.txt
+        ifstream ProductData(userFile);
+
+        if (ProductData.ifstream::is_open()) {
+            while (getline(ProductData, strDat)) {
+                // runs insertNode for each line in the text file
+                insertNode(strDat);
+
+            }
+            cout << "Product(s) added!\n";
+        }
+        else {
+            cout << "File not found.";
+        }
+
+        ProductData.ifstream::close();
+    }
+    
     else {
         return;
     }
@@ -220,6 +245,8 @@ void loadData() {
     current = first;
 }
 
+
+
 bool running = true;
 
 void displayCommands() {
@@ -242,6 +269,7 @@ void runtimeLoop() {
         insertNode();
         break;
     case 3:
+        searchProducts();
     case 4:
     case 5:
     case 6:
