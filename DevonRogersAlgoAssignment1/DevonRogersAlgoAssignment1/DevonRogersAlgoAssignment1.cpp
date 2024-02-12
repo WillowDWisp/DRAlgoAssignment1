@@ -26,6 +26,8 @@ struct nodeType {
 nodeType* first, * last, * newNode;
 nodeType* current;
 
+
+
 void insertNode(string line) {
     newNode = new nodeType;
 
@@ -35,7 +37,15 @@ void insertNode(string line) {
     string s;
     while (std::getline(iss, s, ',')) {
         tempArray.push_back(s);
+
     }
+
+    //this removes a trailing space i was having problems with at the start of the product names. function based off of this code: https://stackoverflow.com/a/39546561 
+    for (int i = 0;i < tempArray[1].size() - 1;i++)
+    {
+        tempArray[1][i] = tempArray[1][i + 1]; //move all element to the left except first one
+    }
+    tempArray[1].pop_back();
 
     newNode->id = std::stoi(tempArray[0]);
     newNode->name = tempArray[1];
@@ -53,6 +63,10 @@ void insertNode(string line) {
         last->link = newNode;
         last = newNode;
     }
+
+}
+
+void insertNode() {
 
 }
 
