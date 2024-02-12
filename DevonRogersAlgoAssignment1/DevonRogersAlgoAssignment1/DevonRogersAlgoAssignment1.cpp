@@ -166,47 +166,77 @@ void insertNode() {
     }
 }
 
-void searchProducts() {
-    cout << "How would you like to search?\n1. By ID\n2. By Name\n3. Cancel\n";
-    int answer;
-    cin >> answer;
-    if (answer == 1) {
-
-    }
-    else if (answer == 2) {
-
-    }
-    else {
-        return;
-    }
-}
-
 //the list of product data stores the categories as characters to save space. this function turns that data back into categories
 string handleCat(char cat) {
     if (cat == 'B') {
         return "Books";
-    }    
+    }
     if (cat == 'C') {
         return "Clothing";
-    }    
+    }
     if (cat == 'H') {
         return "Home & Kitchen";
-    }    
+    }
     if (cat == 'E') {
         return "Electronics";
     }
     return "Other";
 }
 
-//advances the position of 'current'
-void advanceCurrent() {
-    current = current->link;
+void searchProducts() {
+    cout << "How would you like to search?\n1. By ID\n2. By Name\n3. Cancel\n";
+    int answer;
+    cin >> answer;
+    if (answer == 1) {
+        cout << "Please enter the ID of the product you wish to view. If the ID is not unique, only the first instance will be returned.\n";
+        int searchID;
+        cin >> searchID;
+        current = first;
+        while (current != NULL) {
+            if (searchID == current->id) {
+                cout << current->id << ", " << current->name << ", " << current->price << ", " << handleCat(current->category) << endl;
+                break;
+            }
+            else {
+                current = current->link;
+            }
+        }
+    }
+    else if (answer == 2) {
+        cout << "Please enter the name of the product(s) you wish to view. All valid products will be returned.\n";
+        string searchName;
+        std::getline(cin, searchName);
+        std::getline(cin, searchName);
+        current = first;
+        while (current != NULL) {
+            if (searchName.size() > current->name.size()) {
+                current = current->link;
+                continue;
+            }
+
+            for (int i = 0; i < searchName.size();i++) {
+                if (tolower(searchName[i]) != tolower(current->name[i])) {
+                    current = current->link;
+                    break;
+                }
+                else if (i == searchName.size() - 1) {
+                    cout << current->id << ", " << current->name << ", " << current->price << ", " << handleCat(current->category) << endl;
+                    current = current->link;
+                }
+            }
+
+
+
+        }
+    }
+    else {
+        return;
+    }
 }
 
-//returns current to the beginning of the list
-void resetCurrent() {
-    current = first;
-}
+
+
+
 
 //prints all data from the given line
 void printData() {
@@ -269,9 +299,10 @@ void runtimeLoop() {
         insertNode();
         break;
     case 3:
-        searchProducts();
     case 4:
     case 5:
+        searchProducts();
+        break;
     case 6:
     case 7:
         cout << "Have a good day!";
