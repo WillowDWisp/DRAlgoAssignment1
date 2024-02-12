@@ -27,7 +27,6 @@ nodeType* first, * last, * newNode;
 nodeType* current;
 
 
-
 void insertNode(string line) {
     newNode = new nodeType;
 
@@ -41,11 +40,14 @@ void insertNode(string line) {
     }
 
     //this removes a trailing space i was having problems with at the start of the product names. function based off of this code: https://stackoverflow.com/a/39546561 
-    for (int i = 0;i < tempArray[1].size() - 1;i++)
-    {
-        tempArray[1][i] = tempArray[1][i + 1]; //move all element to the left except first one
+    if (tempArray[1][0] == ' ') {
+        for (int i = 0;i < tempArray[1].size() - 1;i++)
+        {
+            tempArray[1][i] = tempArray[1][i + 1]; //move all element to the left except first one
+        }
+        tempArray[1].pop_back();
     }
-    tempArray[1].pop_back();
+
 
     newNode->id = std::stoi(tempArray[0]);
     newNode->name = tempArray[1];
@@ -67,7 +69,91 @@ void insertNode(string line) {
 }
 
 void insertNode() {
+    int answer = 0;
+    cout << "How would you like to add a new product?\n1. One attribute at a time.\n2. All attributes at once.\n3. Cancel.\n";
+    cin >> answer;
+    if (answer == 2) {
+        cout << "Please enter the details for the new product in the following format, replacing the square brackets with the corresponding attribute: [ID], [Name], [Price], [Category]\n";
+        string newProduct;
+        cin >> newProduct;
 
+        //COME BACK TO THIS LATER, SINCE IT'LL BREAK IF THE USER INSERTS SOMETHING INVALID
+        insertNode(newProduct);
+        cout << "Product added!\n";
+    }
+    else if (answer == 1) {
+        int newId;
+        string newName;
+        float newPrice;
+        char newCat;
+
+        newNode = new nodeType;
+        string tempArray;
+
+
+        //yes i did just adapt the code from the other insertNode function
+
+        cout << "Please enter the product's ID. ";
+        cin >> tempArray;
+        newNode->id = std::stoi(tempArray);
+
+        cout << "Please enter the product's name. ";
+        std::getline(cin, tempArray);
+        std::getline(cin, tempArray);
+        //this removes a trailing space i was having problems with at the start of the product names. function based off of this code: https://stackoverflow.com/a/39546561 
+        //this problem probably won't come up in this situation but better safe than sorry
+        if (tempArray[0] == ' ') {
+            for (int i = 0;i < tempArray.size() - 1;i++)
+            {
+                tempArray[i] = tempArray[i + 1]; //move all element to the left except first one
+            }
+            tempArray.pop_back();
+        }
+        newNode->name = tempArray;
+
+        cout << "Please enter the product's price. ";
+        cin >> tempArray;
+        newNode->price = stof(tempArray);
+
+        cout << "Please enter the product's category. ";
+        std::getline(cin, tempArray);
+        std::getline(cin, tempArray);
+        newNode->category = tempArray[0];
+
+        newNode->link = NULL;
+
+        //from page 274/275 of the Malik C++ textbook
+        if (first == NULL) {
+            first = newNode;
+            last = newNode;
+        }
+        else {
+            last->link = newNode;
+            last = newNode;
+        }
+
+        cout << "Product added!\n";
+
+    }
+    //if the user inserts 3 (or anything else) it returns them to the previous menu
+    else {
+        return;
+    }
+}
+
+void searchProducts() {
+    cout << "How would you like to search?\n1. By ID\n2. By Name\n3. Cancel\n";
+    int answer;
+    cin >> answer;
+    if (answer == 1) {
+
+    }
+    else if (answer == 2) {
+
+    }
+    else {
+        return;
+    }
 }
 
 //the list of product data stores the categories as characters to save space. this function turns that data back into categories
@@ -84,7 +170,7 @@ string handleCat(char cat) {
     if (cat == 'E') {
         return "Electronics";
     }
-    return "uh oh";
+    return "Other";
 }
 
 //advances the position of 'current'
@@ -134,13 +220,52 @@ void loadData() {
     current = first;
 }
 
+bool running = true;
+
+void displayCommands() {
+    cout << "1. Display products\n2. Insert product\n3. Update product details\n4. Delete product\n5. Search products\n6. Sort products\n7. Quit\n";
+
+}
+
+void runtimeLoop() {
+    cout << "To view the commands again, enter 0.\nWhat would you like to do? ";
+    int answer;
+    cin >> answer;
+    switch (answer) {
+    case 0:
+        displayCommands();
+        break;
+    case 1:
+        printData();
+        break;
+    case 2:
+        insertNode();
+        break;
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+        cout << "Have a good day!";
+        running = false;
+        break;
+
+    default:
+        cout << "Invalid command. Please try again.";
+        break;
+    }
+}
+
 int main()
 {
     loadData();
+    displayCommands();
+    while (running) {
+        runtimeLoop();
+    }
 
 
-
-    printData();
+    //printData();
 
 }
 
