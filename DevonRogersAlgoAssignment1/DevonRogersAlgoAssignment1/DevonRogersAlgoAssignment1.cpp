@@ -8,6 +8,8 @@
 #include <sstream>
 
 
+//feb 12, 2024: still need to do delete function, sorting algorithm, and the rest of the assignment.
+
 using namespace std;
 
 //template <typename T>;
@@ -32,6 +34,15 @@ void insertNode(string line) {
 
     vector<string> tempArray;
 
+
+    //default values, in case something goes wrong
+    //tempArray[0] = "42069";
+    //tempArray[1] = "None";
+    //tempArray[2] = "80.08";
+    //tempArray[3] = "L";
+    //except the debug variables caused things to go wrong, whoops!
+
+
     std::istringstream iss(line);
     string s;
     while (std::getline(iss, s, ',')) {
@@ -48,7 +59,9 @@ void insertNode(string line) {
         tempArray[1].pop_back();
     }
 
-
+    while (tempArray[0].size() > 5) {
+        tempArray.pop_back();
+    }
     newNode->id = std::stoi(tempArray[0]);
     newNode->name = tempArray[1];
     newNode->price = stof(tempArray[2]);
@@ -67,17 +80,18 @@ void insertNode(string line) {
     }
 
 }
-
+//this function allows the user to insert new products
 void insertNode() {
     int answer = 0;
     cout << "How would you like to add a new product?\n1. One attribute at a time.\n2. All attributes at once.\n3. From a file.\n4. Cancel.\n";
     cin >> answer;
     if (answer == 2) {
-        cout << "Please enter the details for the new product in the following format, replacing the square brackets with the corresponding attribute: [ID], [Name], [Price], [Category]\n";
+        cout << "Please enter the details for the new product in the following format, including the commas, and replacing the square brackets with the corresponding attribute: [ID], [Name], [Price], [Category]\n";
         string newProduct;
         cin >> newProduct;
 
-        //COME BACK TO THIS LATER, SINCE IT'LL BREAK IF THE USER INSERTS SOMETHING INVALID
+        //probably a good idea to redo this at some point, for now i've added default values in case something breaks
+        //nevermind the default variables broke it
         insertNode(newProduct);
         cout << "Product added!\n";
     }
@@ -95,6 +109,9 @@ void insertNode() {
 
         cout << "Please enter the product's ID. ";
         cin >> tempArray;
+        while (tempArray.size() > 5) {
+            tempArray.pop_back();
+        }
         newNode->id = std::stoi(tempArray);
 
         cout << "Please enter the product's name. ";
@@ -168,21 +185,23 @@ void insertNode() {
 
 //the list of product data stores the categories as characters to save space. this function turns that data back into categories
 string handleCat(char cat) {
-    if (cat == 'B') {
+    if (tolower(cat) == 'b') {
         return "Books";
     }
-    if (cat == 'C') {
+    if (tolower(cat) == 'c') {
         return "Clothing";
     }
-    if (cat == 'H') {
+    if (tolower(cat) == 'h') {
         return "Home & Kitchen";
     }
-    if (cat == 'E') {
+    if (tolower(cat) == 'e') {
         return "Electronics";
     }
+    //no custom categories, sorry!
     return "Other";
 }
 
+//this function allows the user to search for products automatically
 void searchProducts() {
     cout << "How would you like to search?\n1. By ID\n2. By Name\n3. Cancel\n";
     int answer;
@@ -225,8 +244,6 @@ void searchProducts() {
                 }
             }
 
-
-
         }
     }
     else {
@@ -234,7 +251,76 @@ void searchProducts() {
     }
 }
 
+void updateProduct(bool encore = false) {
+        bool found = false;
+    if (encore == false) {
+        cout << "Please enter the ID of the product you wish to update. If there are multiple with the same ID, only the first one will be affected.\n";
+        cout << "If you would like to go back to the previous menu, enter \"Cancel\"\n";
+        string answer;
+        cin >> answer;
+        if (tolower(answer[0]) == 'c') {
+            return;
+        }
+        int searchID = std::stoi(answer);
 
+        current = first;
+        while (current != NULL) {
+            if (searchID == current->id) {
+                found = true;
+                break;
+            }
+            else {
+                current = current->link;
+            }
+        }
+    }
+
+    if (found == true) {
+        if (encore == false) {
+            cout << "Product found! ";
+        }
+        cout << "What would you like to modify?\n1. ID\n2. Name\n3. Price\n4. Category\n5. Cancel\n";
+
+        int modifyNum;
+        cin >> modifyNum;
+        if (modifyNum <= 0 || modifyNum > 4) {
+            return;
+        }
+        cout << "Please enter the new ";
+        if (modifyNum == 1) {
+            cout << "ID: ";
+            cin >> current->id;
+            
+        }
+        else if (modifyNum == 2) {
+            cout << "name: ";
+            string junk;
+            std::getline(cin, junk);
+            std::getline(cin, current->name);
+        }
+        else if (modifyNum == 3) {
+            cout << "price: ";
+            cin >> current->price;
+        }
+        else if (modifyNum == 4) {
+            cout << "category: ";
+            string junk;
+            std::getline(cin, junk);
+            std::getline(cin, junk);
+            current->category = junk[0];
+        }
+        cout << "Would you like to modify this product further? Y/N\n";
+        char encoreAns;
+        cin >> encoreAns;
+        if (tolower(encoreAns) == 'y') {
+            updateProduct(true);
+        }
+        else { return; }
+    }
+    else {
+        cout << "No product found!\n";
+    }
+}
 
 
 
@@ -299,6 +385,8 @@ void runtimeLoop() {
         insertNode();
         break;
     case 3:
+        updateProduct();
+        break;
     case 4:
     case 5:
         searchProducts();
