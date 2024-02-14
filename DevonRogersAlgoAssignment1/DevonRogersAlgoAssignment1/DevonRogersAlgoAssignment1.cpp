@@ -9,6 +9,7 @@
 
 
 //feb 12, 2024: still need to do delete function, sorting algorithm, and the rest of the assignment.
+//use "chrono" for the recording the time taken for sorting 
 
 using namespace std;
 
@@ -91,9 +92,10 @@ void insertNode() {
         cin >> newProduct;
 
         //probably a good idea to redo this at some point, for now i've added default values in case something breaks
-        //nevermind the default variables broke it
+        //nevermind the default variables broke it, i'll go back to just praying
         insertNode(newProduct);
         cout << "Product added!\n";
+
     }
     else if (answer == 1) {
         int newId;
@@ -250,7 +252,7 @@ void searchProducts() {
         return;
     }
 }
-
+//this function updates product details
 void updateProduct(bool encore = false) {
         bool found = false;
     if (encore == false) {
@@ -321,8 +323,95 @@ void updateProduct(bool encore = false) {
         cout << "No product found!\n";
     }
 }
+//this function cleanly removes a product from the list
+void deleteProduct() {
+    cout << "Please enter the ID of the product you wish to delete. If there are multiple with the same ID, only the first one will be deleted.\n";
+    cout << "If you would like to go back to the main menu, enter \"Cancel\"\n";
+    string answer;
+    cin >> answer;
+    if (tolower(answer[0]) == 'c') {
+        return;
+    }
+    int searchID = std::stoi(answer);
+    bool found = false;
+    bool isLast = false;
+    if (searchID == last->id) {
+        isLast = true;
+    }
+    current = first;
+    while (current != NULL) {
+        
+        if (searchID == current->id) {
+            found = true;
+            break;
+        }
+        else if (current->link->id == searchID && current->link->link == NULL) {
+            found = true;
+            break;
+        }
+        else {
+            current = current->link;
+        }
+    }
 
+    if (found == true) {
+        cout << "Product found:\n";
+        if (isLast) {
+            cout << last->id << ", " << last->name << ", " << last->price << ", " << handleCat(last->category) << endl;
+        }
+        else {
+            cout << current->id << ", " << current->name << ", " << current->price << ", " << handleCat(current->category) << endl;
+        }
 
+        cout << "Would you like to delete this product? Y/N\n";
+
+        string reply;
+
+        bool unanswered = true;
+        while (unanswered) {
+            cin >> reply;
+            if (tolower(reply[0]) == 'y') {
+                    nodeType* temp;
+                if (current->link->link == NULL) {
+                    temp = current->link;
+                    current->link = NULL;
+                    delete temp;
+                    last = current;
+                    cout << "Product deleted!\n";
+                }
+                else {
+                    //currently this deletes the product *after* the selected one, which is not what it should do.
+                    temp = current->link;
+                    current->link = temp->link;
+                    delete temp;
+                    cout << "Product deleted!\n";
+                }
+
+                unanswered = false;
+            }
+            else if (tolower(reply[0]) == 'n') {
+                cout << "Would you like to delete a different product? Y/N\n";
+                string ans;
+                cin >> ans;
+                if (tolower(ans[0]) == 'y') {
+                    unanswered = false;
+                    deleteProduct();
+                }
+                else {
+                    unanswered = false;
+                    break;
+                }
+            }
+            else {
+                cout << "Invalid command, please try again.\n";
+            }
+        }
+
+    }
+    else {
+        cout << "No product with that ID could be found.\n";
+    }
+}
 
 //prints all data from the given line
 void printData() {
@@ -388,6 +477,8 @@ void runtimeLoop() {
         updateProduct();
         break;
     case 4:
+        deleteProduct();
+        break;
     case 5:
         searchProducts();
         break;
