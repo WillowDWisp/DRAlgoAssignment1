@@ -334,18 +334,23 @@ void deleteProduct() {
     }
     int searchID = std::stoi(answer);
     bool found = false;
+    //if the product the user wants to delete is the last one, it's faster to do this for printing, although you still need to iterate through for current to be set properly
     bool isLast = false;
+    //if the product the user wants to delete is the first one, special handling must be used, otherwise it will be missed
+    bool isFirst = false;
     if (searchID == last->id) {
         isLast = true;
     }
+
     current = first;
-    while (current != NULL) {
-        
-        if (searchID == current->id) {
+    while (current->link != NULL) {
+        if (searchID == first->id) {
+            isFirst = true;
             found = true;
             break;
-        }
-        else if (current->link->id == searchID && current->link->link == NULL) {
+        }   
+
+        if (searchID == current->link->id) {
             found = true;
             break;
         }
@@ -359,8 +364,11 @@ void deleteProduct() {
         if (isLast) {
             cout << last->id << ", " << last->name << ", " << last->price << ", " << handleCat(last->category) << endl;
         }
+        else if (isFirst) {
+            cout << first->id << ", " << first->name << ", " << first->price << ", " << handleCat(first->category) << endl;
+        }
         else {
-            cout << current->id << ", " << current->name << ", " << current->price << ", " << handleCat(current->category) << endl;
+            cout << current->link->id << ", " << current->link->name << ", " << current->link->price << ", " << handleCat(current->link->category) << endl;
         }
 
         cout << "Would you like to delete this product? Y/N\n";
@@ -371,22 +379,33 @@ void deleteProduct() {
         while (unanswered) {
             cin >> reply;
             if (tolower(reply[0]) == 'y') {
-                    nodeType* temp;
-                if (current->link->link == NULL) {
-                    temp = current->link;
-                    current->link = NULL;
-                    delete temp;
-                    last = current;
-                    cout << "Product deleted!\n";
+
+                nodeType* temp;
+                if (isFirst) {
+                    //if the given product is the first product, have temp be equal to first, then move first down the list by one
+                    temp = first;
+                    first = first->link;
                 }
                 else {
-                    //currently this deletes the product *after* the selected one, which is not what it should do.
                     temp = current->link;
-                    current->link = temp->link;
-                    delete temp;
-                    cout << "Product deleted!\n";
                 }
 
+                if (!isFirst) {
+                    //if the given product is the last product, set current's link to NULL and set last to be current
+                    if (temp->link == NULL) {
+                        current->link = NULL;
+                        last = current;
+                    }
+                    else {
+                        //if the given product is not the first or last product, remove it as normal.
+                        current->link = temp->link;
+
+                    }
+                }
+
+
+                delete temp; //this line removes the deleted product from memory, freeing up the space for other uses
+                cout << "Product deleted!\n";
                 unanswered = false;
             }
             else if (tolower(reply[0]) == 'n') {
@@ -412,6 +431,12 @@ void deleteProduct() {
         cout << "No product with that ID could be found.\n";
     }
 }
+
+//this function sorts the list of products. it can sort by price in ascending and descending order
+void sortProducts() {
+
+}
+
 
 //prints all data from the given line
 void printData() {
