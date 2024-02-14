@@ -7,16 +7,12 @@
 #include <string>
 #include <sstream>
 
+#include <chrono> //this file is used to measure/record the time taken by the sorting function
 
-//feb 12, 2024: still need to do delete function, sorting algorithm, and the rest of the assignment.
-//use "chrono" for the recording the time taken for sorting 
+
 
 using namespace std;
-
-//template <typename T>;
-
-/*start of massive debug comment*/
-
+//this struct is the backbone of the whole program; it forms the nodes of the linked list that product data is stored in
 struct nodeType {
     int id;
     string name;
@@ -26,6 +22,7 @@ struct nodeType {
     nodeType *link;
 };
 
+//initialize various nodes that are used throughout the program
 nodeType* first, * last, * newNode;
 nodeType* current;
 
@@ -34,14 +31,6 @@ void insertNode(string line) {
     newNode = new nodeType;
 
     vector<string> tempArray;
-
-
-    //default values, in case something goes wrong
-    //tempArray[0] = "42069";
-    //tempArray[1] = "None";
-    //tempArray[2] = "80.08";
-    //tempArray[3] = "L";
-    //except the debug variables caused things to go wrong, whoops!
 
 
     std::istringstream iss(line);
@@ -91,18 +80,14 @@ void insertNode() {
         string newProduct;
         cin >> newProduct;
 
-        //probably a good idea to redo this at some point, for now i've added default values in case something breaks
-        //nevermind the default variables broke it, i'll go back to just praying
-        insertNode(newProduct);
+
+        insertNode(newProduct); //WARNING: this line is very volatile , and *will* crash the program if the input is formatted wrong.
+        //I tried adding default values for when something went wrong, but ended up making things worse
+
         cout << "Product added!\n";
 
     }
     else if (answer == 1) {
-        int newId;
-        string newName;
-        float newPrice;
-        char newCat;
-
         newNode = new nodeType;
         string tempArray;
 
@@ -325,7 +310,7 @@ void updateProduct(bool encore = false) {
 }
 //this function cleanly removes a product from the list
 void deleteProduct() {
-    cout << "Please enter the ID of the product you wish to delete. If there are multiple with the same ID, only the first one will be deleted.\n";
+    cout << "Please enter the ID of the product you wish to delete. If there are multiple with the same ID, only the first one will be deleted, unless the last product is a duplicate, then that one will be affected.\n";
     cout << "If you would like to go back to the main menu, enter \"Cancel\"\n";
     string answer;
     cin >> answer;
@@ -432,9 +417,109 @@ void deleteProduct() {
     }
 }
 
-//this function sorts the list of products. it can sort by price in ascending and descending order
-void sortProducts() {
+//this function swaps the values of the node at "current" and the node at "current->link". it is called swapPointers because I originally tried to sort the list by only moving the pointers, which did not work.
+void swapPointers() {
+    nodeType* tempNode = new nodeType;
+    
+    tempNode->link = current;
 
+    tempNode->id = current->id;
+    tempNode->name = current->name;
+    tempNode->price = current->price;
+    tempNode->category = current->category;
+
+    current->id = current->link->id;
+    current->name = current->link->name;
+    current->price = current->link->price;
+    current->category = current->link->category;
+
+    current->link->id = tempNode->id;
+    current->link->name = tempNode->name;
+    current->link->price = tempNode->price;
+    current->link->category = tempNode->category;
+
+
+}
+
+//this function sorts the list of products. it can sort by price in ascending and descending order
+    //sorts via bubble sort; code adapted from here: https://www.geeksforgeeks.org/bubble-sort/
+    //the code I used for timing the sorting algorithm came from here: https://www.geeksforgeeks.org/chrono-in-c/
+void sortProducts() {
+    cout << "How would you like the products ordered?\n1. Ascending order\n2. Descending order\n3. Cancel\n";
+    int initAns = 0;
+    cin >> initAns;
+    int listLength = 0;
+    //if the user doesn't enter 1 or 2, there's no point wasting time doing everything else this function does
+    if (initAns != 1 && initAns != 2) {
+        return;
+    }
+    
+    current = first;
+    while (current != NULL) {
+        listLength++;
+        //cout << listLength << endl;
+        current = current->link;
+
+    }
+    
+
+    current = first;
+
+    int debugCounter = 0;
+
+    cout << "Sorting...\n";
+
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+
+    start = std::chrono::system_clock::now();
+    //if the user wants the list sorted in ascending order, use the first option
+    if (initAns == 1) {
+        for (int i = 0; i < listLength - 1; i++) {
+            current = first;
+            bool swapped = false;
+            for (int j = 0; j < listLength - i - 1; j++) {
+                if (current->price > current->link->price) {
+                    
+                    swapPointers();
+
+                    swapped = true;
+                }
+                current = current->link;
+            }
+
+            //if nothing gets swapped by the inner loop, break the loop to cut down on time
+            if (swapped == false) {
+                break;
+            }
+        }
+    } //else use the second option
+    else {
+        for (int i = 0; i < listLength - 1; i++) {
+            current = first;
+            bool swapped = false;
+            for (int j = 0; j < listLength - i - 1; j++) {
+                //cout << i << "," << j << endl;
+                if (current->price < current->link->price) {
+                    swapPointers();
+                    
+                    swapped = true;
+                }
+                current = current->link;
+
+            }
+
+            //if nothing gets swapped by the inner loop, break the loop to cut down on time
+            if (swapped == false) {
+                break;
+            }
+        }
+    }
+    end = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+    cout << "Sorted! Time taken: " << elapsed_seconds.count() << "s\n";
 }
 
 
@@ -449,7 +534,6 @@ void printData() {
     }
 }
 
-/*end of massive debug comment*/
 
 void loadData() {
     first = NULL;
@@ -508,6 +592,8 @@ void runtimeLoop() {
         searchProducts();
         break;
     case 6:
+        sortProducts();
+        break;
     case 7:
         cout << "Have a good day!";
         running = false;
