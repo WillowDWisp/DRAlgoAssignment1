@@ -40,6 +40,10 @@ void insertNode(string line) {
 
     }
 
+    if (tempArray.size() < 3) {
+        throw invalid_argument("");
+    }
+
     //this removes a trailing space i was having problems with at the start of the product names. function based off of this code: https://stackoverflow.com/a/39546561 
     if (tempArray[1][0] == ' ') {
         for (int i = 0;i < tempArray[1].size() - 1;i++)
@@ -52,6 +56,8 @@ void insertNode(string line) {
     while (tempArray[0].size() > 5) {
         tempArray.pop_back();
     }
+
+
     newNode->id = std::stoi(tempArray[0]);
     newNode->name = tempArray[1];
     newNode->price = stof(tempArray[2]);
@@ -80,8 +86,18 @@ void insertNode() {
         string newProduct;
         cin >> newProduct;
 
+        try {
+            insertNode(newProduct); 
+        }
+        catch (invalid_argument) {
+            cout << "Invalid formatting!\n";
+            return;
+        }
 
-        insertNode(newProduct); //WARNING: this line is very volatile , and *will* crash the program if the input is formatted wrong.
+
+
+        
+        //WARNING: this line is very volatile , and *will* crash the program if the input is formatted wrong.
         //I tried adding default values for when something went wrong, but ended up making things worse
 
         cout << "Product added!\n";
@@ -153,7 +169,12 @@ void insertNode() {
         if (ProductData.ifstream::is_open()) {
             while (getline(ProductData, strDat)) {
                 // runs insertNode for each line in the text file
-                insertNode(strDat);
+                try {
+                    insertNode(strDat);
+                }
+                catch (invalid_argument) { //if a line is incorrectly formatted, catch that and skip it
+                    cout << "Invalid line detected, skipping.\n";
+                }
 
             }
             cout << "Product(s) added!\n";
@@ -547,8 +568,13 @@ void loadData() {
     if (ProductData.ifstream::is_open()) {
         while (getline(ProductData, strDat)) {
             // runs insertNode for each line in the text file
-            insertNode(strDat);
+            try {
+                insertNode(strDat);
+            }
+            catch (invalid_argument) {//while this shouldn't happen, it's better to be safe than sorry
+                cout << "Invalid line detected, skipping.\n";
 
+            }
         }
     }
     else {
