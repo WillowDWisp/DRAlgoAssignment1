@@ -260,7 +260,11 @@ void searchProducts() {
 }
 //this function updates product details
 void updateProduct(bool encore = false) {
-        bool found = false;
+    bool found = false;
+    if (encore == true) {
+        found = true;
+    }
+
     if (encore == false) {
         cout << "Please enter the ID of the product you wish to update. If there are multiple with the same ID, only the first one will be affected.\n";
         cout << "If you would like to go back to the previous menu, enter \"Cancel\"\n";
